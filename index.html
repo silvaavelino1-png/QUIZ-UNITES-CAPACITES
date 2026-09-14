@@ -1,851 +1,693 @@
 <!DOCTYPE html>
-<html lang="fr" class="h-full bg-slate-900 text-slate-100">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Interactif : Réseaux Informatiques, Débits & Connecteurs</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- QRCodeJS Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <title>Quiz Interactif : Quantités, Débits & Connecteurs</title>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+        :root {
+            --primary: #1a365d;
+            --accent: #2b6cb0;
+            --bg: #f7fafc;
+            --card-bg: #ffffff;
+            --text: #2d3748;
+            --success: #2f855a;
+            --danger: #c53030;
         }
-        .option-btn {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            margin: 0;
+            padding: 20px;
         }
-        .option-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin: 0 0 5px 0;
+            font-size: 20pt;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-weight: 600;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* ÉCRAN D'ACCUEIL */
+        .welcome-card {
+            max-width: 500px;
+            margin: 20px auto 0 auto;
+            padding: 30px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+        }
+
+        .welcome-title {
+            text-align: center;
+            font-size: 14pt;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 11pt;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        .btn {
+            display: inline-block;
+            width: 100%;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 12pt;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--primary);
+        }
+
+        .btn-secondary {
+            background-color: #4a5568;
+            margin-top: 15px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #2d3748;
+        }
+
+        .quiz-header {
+            position: sticky;
+            top: 0;
+            background: #edf2f7;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-weight: bold;
+            border: 1px solid #cbd5e0;
+            z-index: 100;
+        }
+
+        .timer {
+            color: var(--danger);
+            font-size: 13pt;
+        }
+
+        .question-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .question-title {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 11pt;
+            margin-bottom: 12px;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .option-item {
+            margin-bottom: 8px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .option-label input {
+            margin-right: 12px;
+        }
+
+        .result-box {
+            background-color: #ebf8ff;
+            border: 2px solid #3182ce;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .score-display {
+            font-size: 32pt;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .student-info {
+            font-size: 12pt;
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+
+        .copy-box {
+            background: #ffffff;
+            border: 2px dashed #a0aec0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .copy-box textarea {
+            width: 100%;
+            height: 130px;
+            font-family: monospace;
+            font-size: 10pt;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            resize: none;
+            margin-bottom: 15px;
+        }
+
+        .btn-ecole-directe {
+            background-color: #38a169;
+            font-size: 13pt;
+            padding: 16px;
+        }
+
+        .btn-ecole-directe:hover {
+            background-color: #276749;
+        }
+
+        .instructions-ecole {
+            font-size: 10pt;
+            color: #4a5568;
+            margin-top: 15px;
+            text-align: left;
+            background-color: #f7fafc;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border-left: 4px solid #38a169;
+        }
+
+        /* CORRECTION */
+        .correction-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 15px;
+            background-color: #faf5ff;
+        }
+
+        .correction-card.correct {
+            border-left: 5px solid var(--success);
+            background-color: #f0fff4;
+        }
+
+        .correction-card.incorrect {
+            border-left: 5px solid var(--danger);
+            background-color: #fff5f5;
+        }
+
+        .correction-status {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .correction-status.correct {
+            color: var(--success);
+        }
+
+        .correction-status.incorrect {
+            color: var(--danger);
+        }
+
+        .user-answer, .correct-answer {
+            font-size: 10.5pt;
+            margin-top: 4px;
         }
     </style>
 </head>
-<body class="min-h-full flex flex-col justify-between p-4 md:p-8">
+<body>
 
-    <!-- Container Principal -->
-    <div class="max-w-5xl mx-auto w-full flex-grow flex flex-col justify-center my-auto py-4">
-
-        <!-- ÉCRAN D'ACCUEIL / CONSIGNES & PROJECTION TABLEAU -->
-        <div id="screen-welcome" class="glass-card rounded-3xl p-6 md:p-10 shadow-2xl space-y-8">
-            
-            <!-- En-tête -->
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-700/80 pb-6 text-center md:text-left">
-                <div>
-                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-blue-600/20 text-blue-400 rounded-full text-xs font-semibold mb-2">
-                        <i class="fa-solid fa-graduation-cap"></i> Évaluation Réseaux & Connectique
-                    </div>
-                    <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-white">
-                        Quiz Réseaux Informatiques
-                    </h1>
-                    <p class="text-slate-300 text-sm md:text-base mt-1">
-                        Unités, débits, conversions, connecteurs (RJ45, LC, SFP+), normes Wi-Fi & Fibre (FTTH/XGS-PON).
-                    </p>
-                </div>
-                <div class="px-4 py-2 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-xl text-sm font-semibold flex items-center gap-2">
-                    <i class="fa-regular fa-clock text-lg"></i>
-                    <span>Durée : 20 min</span>
-                </div>
-            </div>
-
-            <!-- Grille d'accès pour les élèves (Projetée au tableau) -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-                
-                <!-- Zone QR Code Géant (Tablettes) -->
-                <div class="lg:col-span-5 bg-slate-800/90 rounded-2xl p-6 border border-slate-700 flex flex-col items-center justify-center text-center shadow-inner">
-                    <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-400 mb-3 bg-blue-950/80 px-3 py-1 rounded-full border border-blue-800/50">
-                        <i class="fa-solid fa-tablet-screen-button"></i> Scan Tablette / Smartphone
-                    </div>
-                    
-                    <!-- Grand QR Code (Haute visibilité pour projection) -->
-                    <div class="bg-white p-4 rounded-2xl shadow-2xl my-2 border-4 border-slate-200">
-                        <div id="qrcode"></div>
-                    </div>
-
-                    <span class="text-xs text-slate-300 font-medium mt-3 flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-expand text-blue-400"></i> QR Code haute visibilité pour projection au tableau
-                    </span>
-                </div>
-
-                <!-- Zone Lien Raccourci (Ordinateur) & Consignes ÉcoleDirecte -->
-                <div class="lg:col-span-7 flex flex-col justify-between space-y-5">
-                    
-                    <!-- Lien Raccourci Ordi -->
-                    <div class="bg-slate-800/90 p-5 rounded-2xl border border-slate-700 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                                <i class="fa-solid fa-laptop"></i> Lien raccourci (Pour Ordinateur)
-                            </span>
-                            <span class="text-[11px] text-slate-400">Pour les élèves sans caméra</span>
-                        </div>
-                        <div class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-700/80">
-                            <i class="fa-solid fa-link text-slate-400 ml-2"></i>
-                            <input type="text" id="custom-url-input" value="https://tinyurl.com/5s2a4ffn" 
-                                oninput="updateUrlAndQr(this.value)"
-                                class="bg-transparent font-mono text-sm md:text-base font-bold text-blue-300 w-full focus:outline-none"
-                                title="URL modifiable par l'enseignant">
-                            <button onclick="copyShortcutUrl()" 
-                                class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-lg shadow transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
-                                <i class="fa-regular fa-copy"></i> Copier
-                            </button>
-                        </div>
-                    
-                        </p>
-                    </div>
-
-                    <!-- Consignes ÉcoleDirecte -->
-                    <div class="bg-slate-800/80 p-5 rounded-2xl border border-slate-700/70 space-y-3 text-sm">
-                        <div class="flex items-center gap-2 text-amber-400 font-bold text-base">
-                            <i class="fa-solid fa-circle-info"></i> Modalités de rendu - ÉcoleDirecte :
-                        </div>
-                        <ul class="list-disc list-inside space-y-2 text-slate-300 text-xs md:text-sm pl-1">
-                            <li>Complétez les <strong>20 questions</strong> du quiz.</li>
-                            <li>En fin d'épreuve, cliquez sur <strong>« Copier le bilan pour ÉcoleDirecte »</strong>.</li>
-                            <li>Collez le résumé dans la <strong>Messagerie ou le Travail à Rendre ÉcoleDirecte</strong> à destination de votre enseignant <strong>M. Avelino GONÇALVES SILVA</strong>.</li>
-                        </ul>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- Formulaire Identité Élève & Bouton Lancement -->
-            <form id="start-form" onsubmit="startQuiz(event)" class="pt-2 border-t border-slate-700/80 space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="text-left">
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Prénom de l'élève *</label>
-                        <input type="text" id="user-firstname" required placeholder="Ex: Lucas"
-                            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
-                    </div>
-                    <div class="text-left">
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Nom de famille *</label>
-                        <input type="text" id="user-lastname" required placeholder="Ex: Martin"
-                            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
-                    </div>
-                    <div class="text-left">
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Classe *</label>
-                        <input type="text" id="user-class" required placeholder="Ex: 1ère CIEL / Term SN"
-                            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
-                    </div>
-                </div>
-
-                <button type="submit" 
-                    class="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold py-4 px-6 rounded-2xl shadow-xl shadow-blue-600/25 transition duration-200 flex items-center justify-center gap-3 text-lg cursor-pointer transform hover:-translate-y-0.5">
-                    <i class="fa-solid fa-play"></i>
-                    <span>DÉMARRER LE QUIZ MAINTENANT</span>
-                </button>
-            </form>
-
-        </div>
-
-        <!-- ÉCRAN DU QUIZ -->
-        <div id="screen-quiz" class="hidden glass-card rounded-3xl p-6 md:p-8 shadow-2xl space-y-6">
-            
-            <!-- Barre supérieure : Profil, Progression, Chrono -->
-            <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-700/60">
-                <div class="flex items-center gap-3">
-                    <div class="p-2.5 bg-slate-800 rounded-xl border border-slate-700">
-                        <i class="fa-solid fa-user-graduate text-blue-400 text-xl"></i>
-                    </div>
-                    <div>
-                        <div id="display-user-name" class="font-extrabold text-white leading-tight"></div>
-                        <div id="display-user-class" class="text-xs text-blue-400 font-medium"></div>
-                    </div>
-                </div>
-
-                <!-- Chronomètre -->
-                <div class="flex items-center gap-2.5 bg-slate-800 px-5 py-2.5 rounded-xl border border-slate-700 text-amber-400 font-mono font-bold text-lg shadow-inner">
-                    <i class="fa-regular fa-clock animate-pulse text-xl"></i>
-                    <span id="timer-display">20:00</span>
-                </div>
-            </div>
-
-            <!-- Grille de saut rapide entre les questions -->
-            <div class="space-y-2">
-                <div class="flex justify-between items-center text-xs text-slate-400 font-semibold">
-                    <span id="display-progress">Question 1 sur 20</span>
-                    <span id="answered-count-display">0 / 20 répondue(s)</span>
-                </div>
-                <div id="question-grid" class="flex flex-wrap gap-1.5 pt-1">
-                    <!-- Pastilles numérotées dynamiques -->
-                </div>
-            </div>
-
-            <!-- Barre de progression visuelle -->
-            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                <div id="progress-bar" class="bg-blue-500 h-full w-0 transition-all duration-300"></div>
-            </div>
-
-            <!-- Bloc Question -->
-            <div class="space-y-3 pt-2">
-                <div class="inline-block px-3 py-1 bg-blue-950/80 text-blue-400 border border-blue-800/50 rounded-full text-xs font-semibold uppercase tracking-wider" id="question-category">
-                    Catégorie
-                </div>
-                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-white leading-snug">
-                    Question...
-                </h2>
-            </div>
-
-            <!-- Options de réponses -->
-            <div id="options-container" class="grid grid-cols-1 gap-3 pt-2">
-                <!-- Généré en JS -->
-            </div>
-
-            <!-- Pied de page du Quiz : Navigation -->
-            <div class="flex justify-between items-center pt-4 border-t border-slate-700/60">
-                <button id="btn-prev" onclick="prevQuestion()" disabled
-                    class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl disabled:opacity-30 disabled:cursor-not-allowed transition flex items-center gap-2">
-                    <i class="fa-solid fa-chevron-left text-xs"></i> Précédent
-                </button>
-                
-                <button id="btn-next" onclick="nextQuestion()"
-                    class="px-7 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg transition flex items-center gap-2 cursor-pointer">
-                    <span id="next-btn-text">Suivant</span>
-                    <i class="fa-solid fa-chevron-right text-xs"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- ÉCRAN DES RÉSULTATS -->
-        <div id="screen-results" class="hidden glass-card rounded-3xl p-6 md:p-10 shadow-2xl space-y-8">
-            
-            <div class="text-center space-y-4">
-                <div class="inline-flex items-center justify-center p-5 rounded-full bg-slate-800 border border-slate-700">
-                    <i id="score-icon" class="fa-solid fa-trophy text-5xl text-yellow-400"></i>
-                </div>
-                <h2 class="text-3xl md:text-4xl font-extrabold text-white">Résultats du Quiz</h2>
-                <p id="result-user-info" class="text-slate-300 font-medium"></p>
-
-                <!-- Cadre Score -->
-                <div class="bg-slate-800/90 p-6 rounded-2xl max-w-md mx-auto border border-slate-700 space-y-2 shadow-lg">
-                    <div class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Score Final</div>
-                    <div class="text-5xl font-black text-white" id="final-score">0 / 20</div>
-                    <div id="score-percentage" class="text-base font-bold text-blue-400">0% de réussite</div>
-                    <div id="completion-time" class="text-xs text-slate-400 pt-1 border-t border-slate-700/60 mt-2"></div>
-                </div>
-            </div>
-
-            <!-- Bloc Action ÉcoleDirecte -->
-            <div class="bg-blue-950/40 border border-blue-800/60 p-6 rounded-2xl max-w-2xl mx-auto text-center space-y-4">
-                <div class="flex items-center justify-center gap-2 text-blue-400 font-bold text-lg">
-                    <i class="fa-solid fa-paper-plane"></i> Transmission des résultats via ÉcoleDirecte
-                </div>
-                <p class="text-sm text-slate-300">
-                    Cliquez sur le bouton ci-dessous pour copier automatiquement votre bilan de réponse. Vous n'avez plus qu'à le coller dans un message ou travail à rendre sur <strong>ÉcoleDirecte</strong> pour <strong>M. Avelino GONÇALVES SILVA</strong>.
-                </p>
-                <div class="flex justify-center gap-4 flex-wrap">
-                    <button onclick="copyToClipboardÉcoleDirecte()" 
-                        class="px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center gap-3 text-base cursor-pointer transform hover:-translate-y-0.5">
-                        <i class="fa-regular fa-copy text-xl"></i>
-                        <span>Copier le bilan pour ÉcoleDirecte</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Zone de notification -->
-            <div id="notification" class="hidden max-w-md mx-auto p-4 rounded-xl bg-emerald-900/90 border border-emerald-500 text-emerald-100 text-sm font-semibold text-center shadow-xl"></div>
-
-            <!-- Récapitulatif détaillé des réponses -->
-            <div class="space-y-4 pt-4 border-t border-slate-700">
-                <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-list-check text-blue-400"></i>
-                    Correction & Explications détaillées
-                </h3>
-                <div id="review-container" class="space-y-4">
-                    <!-- Généré dynamiquement en JS -->
-                </div>
-            </div>
-
-            <div class="text-center pt-6">
-                <button onclick="location.reload()" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl transition">
-                    <i class="fa-solid fa-rotate-right mr-2"></i> Recommencer le Quiz
-                </button>
-            </div>
-
-        </div>
-
+<div class="container">
+    <div class="header">
+        <h1>Évaluation : Quantités, Débits & Connecteurs</h1>
+        <div class="subtitle">BAC PRO CIEL / MTNE</div>
     </div>
 
-    <script>
-        // Banque des 20 questions spécialisées
-        const quizData = [
-            {
-                category: "Unités & Conversions",
-                question: "Combien d'octets (Bytes) comporte exactement un transfert de 1 Megabit (1 Mb) de données ?",
-                options: [
-                    "100 000 octets",
-                    "125 000 octets",
-                    "1 000 000 d'octets",
-                    "8 000 000 d'octets"
-                ],
-                correct: 1,
-                explanation: "Un octet vaut 8 bits. 1 Megabit (Mb) = 1 000 000 bits. Donc 1 000 000 / 8 = 125 000 octets (soit 125 ko)."
-            },
-            {
-                category: "Calculs de Débit",
-                question: "Combien de temps théorique faut-il pour télécharger un fichier de 1 Go (Gigaoctet) avec une connexion de 100 Mb/s (Megabits/s) ?",
-                options: [
-                    "10 secondes",
-                    "80 secondes",
-                    "100 secondes",
-                    "800 secondes"
-                ],
-                correct: 1,
-                explanation: "1 Go = 8 Gigabits (8 000 Mb). Temps = 8 000 Mb / 100 Mb/s = 80 secondes (soit 1 minute 20 secondes)."
-            },
-            {
-                category: "Connecteurs Cuivre",
-                question: "Quel connecteur physique 8 broches (8P8C) est le standard absolu pour le câblage réseau Ethernet cuivre ?",
-                options: [
-                    "RJ11",
-                    "RJ45",
-                    "BNC",
-                    "USB-C"
-                ],
-                correct: 1,
-                explanation: "Le RJ45 est le connecteur normalisé universel pour le câblage réseau Ethernet à paires torsadées."
-            },
-            {
-                category: "Catégories de Câbles",
-                question: "Quelle catégorie minimale de câble Ethernet cuivre garantit un débit de 10 Gbit/s sur la distance maximale de 100 mètres ?",
-                options: [
-                    "Catégorie 5e",
-                    "Catégorie 6",
-                    "Catégorie 6A",
-                    "Catégorie 3"
-                ],
-                correct: 2,
-                explanation: "La Cat 6 limite le 10 Gb/s à ~55m. Pour 10 Gbit/s garanti sur 100m à 500 MHz, la norme requiert la Catégorie 6A (Augmented)."
-            },
-            {
-                category: "Connecteurs Fibre Optique",
-                question: "Quel connecteur de fibre optique utilise un verrouillage Push-Pull avec une férule fine de 1,25 mm, très répandu en haute densité ?",
-                options: [
-                    "ST (Straight Tip)",
-                    "SC (Subscriber Connector)",
-                    "LC (Lucent Connector)",
-                    "MTRJ"
-                ],
-                correct: 2,
-                explanation: "Le connecteur LC est un connecteur petit format (SFF) à encliquetage, standard sur les switchs et modules SFP."
-            },
-            {
-                category: "Fibre Optique",
-                question: "Quelle est la particularité physique principale d'une fibre optique Monomode (SMF) par rapport à une Multimode (MMF) ?",
-                options: [
-                    "Un cœur très large permettant la réflexion de multiples rayons lumineux",
-                    "Un cœur très fin (~9 µm) réduisant la dispersion, idéal pour les très longues distances",
-                    "Un conducteur en cuivre interne pour injecter de l'alimentation électrique",
-                    "Un débit maximal bridé à 100 Mbit/s"
-                ],
-                correct: 1,
-                explanation: "La fibre Monomode a un cœur extrêmement fin (environ 9 microns), autorisant un seul mode de propagation pour la lumière et couvrant des dizaines de kilomètres."
-            },
-            {
-                category: "Modules d'Interface",
-                question: "Quel format de module transcepteur (transceiver) amovible insère-t-on dans un switch pour obtenir un port optique 10 Gbit/s ?",
-                options: [
-                    "SFP (1000BASE-X)",
-                    "SFP+",
-                    "RJ11",
-                    "QSFP28"
-                ],
-                correct: 1,
-                explanation: "Le format SFP+ (Small Form-factor Pluggable Plus) est l'évolution directe du SFP, spécifiquement conçu pour les débits 10 Gbit/s."
-            },
-            {
-                category: "Modules d'Interface",
-                question: "Quel format de module optique regroupe 4 canaux indépendants pour offrir des liaisons à 40 Gbit/s ou 100 Gbit/s en Data Center ?",
-                options: [
-                    "QSFP / QSFP+",
-                    "RJ45 Standard",
-                    "SFP 1G",
-                    "PCIe Gen 3"
-                ],
-                correct: 0,
-                explanation: "QSFP signifie Quad Small Form-factor Pluggable. Il agrège 4 voies optiques pour atteindre 40 Gb/s (QSFP+) ou 100 Gb/s (QSFP28)."
-            },
-            {
-                category: "Normes Wi-Fi",
-                question: "Quelle est la désignation commerciale officielle de la norme Wi-Fi IEEE 802.11ax ?",
-                options: [
-                    "Wi-Fi 4",
-                    "Wi-Fi 5",
-                    "Wi-Fi 6",
-                    "Wi-Fi 7"
-                ],
-                correct: 2,
-                explanation: "La norme 802.11ax correspond au Wi-Fi 6 (et Wi-Fi 6E pour l'extension dans la bande de fréquences des 6 GHz)."
-            },
-            {
-                category: "Normes Wi-Fi",
-                question: "Quelle bande de fréquence supplémentaire est exploitée par le Wi-Fi 6E et le Wi-Fi 7 pour éliminer les interférences ?",
-                options: [
-                    "900 MHz",
-                    "2,4 GHz",
-                    "5 GHz",
-                    "6 GHz"
-                ],
-                correct: 3,
-                explanation: "Le Wi-Fi 6E et le Wi-Fi 7 intègrent le spectre des 6 GHz, apportant de nouveaux canaux ultra-larges de 160 et 320 MHz."
-            },
-            {
-                category: "Technologies Fibre FTTH",
-                question: "Dans le déploiement FTTH GPON, que signifie l'architecture PON (Passive Optical Network) ?",
-                options: [
-                    "Chaque abonné dispose d'un câble coaxial en cuivre direct",
-                    "Le signal est partagé entre plusieurs abonnés via des coupleurs/splitters optiques passifs sans alimentation",
-                    "Les commutateurs doivent être installés dans la rue tous les 50 mètres",
-                    "La fibre est obligatoirement convertie en signal ADSL à l'entrée"
-                ],
-                correct: 1,
-                explanation: "Le PON est une architecture point-à-multipoint utilisant des répartiteurs/splitters passifs (sans électricité) pour diviser une fibre vers 32 ou 64 abonnés."
-            },
-            {
-                category: "Technologies Fibre FTTH",
-                question: "Quelle évolution du GPON permet d'offrir un débit symétrique de 10 Gbit/s sur le réseau d'accès FTTH ?",
-                options: [
-                    "VDSL2",
-                    "XGS-PON",
-                    "DOCSIS 3.0",
-                    "Fast Ethernet"
-                ],
-                correct: 1,
-                explanation: "Le XGS-PON (10-Gigabit Symmetric Passive Optical Network) est la norme FTTH permettant 10 Gb/s aussi bien en téléchargement qu'en envoi."
-            },
-            {
-                category: "Connecteurs & Bus",
-                question: "Quelle technologie d'interface (utilisant un connecteur USB-C) permet d'atteindre des débits allant jusqu'à 40 ou 80 Gbit/s ?",
-                options: [
-                    "Thunderbolt 4 / 5",
-                    "VGA",
-                    "S-Video",
-                    "USB 2.0"
-                ],
-                correct: 0,
-                explanation: "Les protocoles Thunderbolt 4 et 5 s'appuient sur le connecteur USB-C pour acheminer du PCI Express et de l'affichage vidéo jusqu'à 80 Gb/s."
-            },
-            {
-                category: "Normes Ethernet",
-                question: "Que désigne la mention « 1000BASE-T » dans les spécifications des cartes réseaux ?",
-                options: [
-                    "Une liaison fibre optique de 1000 mètres",
-                    "Un débit de 1 Gbit/s (1000 Mbps) sur câble cuivre à paires torsadées",
-                    "Une vitesse Wi-Fi maximale de 1000 Mbps",
-                    "Une connexion série à 1000 Bauds"
-                ],
-                correct: 1,
-                explanation: "1000 = débit en Mbit/s ( Gigabit Ethernet ), BASE = bande de base, T = Twisted Pair (paires torsadées cuivre)."
-            },
-            {
-                category: "Unités & Standard IEC",
-                question: "Quelle différence fondamentale existe-t-il entre un Mégaoctet (Mo) et un Mébioctet (Mio) ?",
-                options: [
-                    "Le Mo est basé sur la puissance de 10 (1 Mo = 1 000 000 octets) et le Mio sur la puissance de 2 (1 Mio = 1 048 576 octets)",
-                    "Le Mio est réservé uniquement aux transmissions hertziennes sans fil",
-                    "Le Mo contient 1024 octets et le Mio contient 1000 octets",
-                    "C'est la même unité avec une écriture américaine"
-                ],
-                correct: 0,
-                explanation: "1 Mo (décimal, SI) = 10^6 = 1 000 000 octets. 1 Mio (binaire, IEC) = 2^20 = 1 048 576 octets."
-            },
-            {
-                category: "Câblage & Blindage",
-                question: "Que signifie le sigle S/FTP concernant la structure d'un câble réseau RJ45 ?",
-                options: [
-                    "Câble totalement dépourvu de blindage intérieur",
-                    "Une tresse métallique globale (S) englobant des paires individuellement blindées par une feuille d'aluminium (FTP)",
-                    "Un câble intégrant une fibre optique centrale",
-                    "Un blindage spécifique destiné aux réseaux téléphoniques ruraux"
-                ],
-                correct: 1,
-                explanation: "S/FTP = Screened Foiled Twisted Pair : Tresse générale autour du câble (S) + Feuille d'aluminium sur chaque paire (FTP) pour parer aux interférences."
-            },
-            {
-                category: "Connecteurs Fibre",
-                question: "Quel connecteur de fibre optique historique possède un mécanisme de verrouillage à baïonnette circulaire ?",
-                options: [
-                    "ST (Straight Tip)",
-                    "LC",
-                    "RJ45",
-                    "QSFP"
-                ],
-                correct: 0,
-                explanation: "Le connecteur ST (Straight Tip) possède un corps rond en métal s'enclenchant par quart de tour à baïonnette."
-            },
-            {
-                category: "Matériel & Bus Interne",
-                question: "Quel bus d'extension interne sur la carte mère est utilisé par les cartes réseau 10/25/100 Gigabit de haute performance ?",
-                options: [
-                    "SATA",
-                    "PCI Express (PCIe)",
-                    "AGP",
-                    "IDE"
-                ],
-                correct: 1,
-                explanation: "Le bus PCI Express (PCIe) offre la bande passante et les lignes (lanes x4, x8, x16) nécessaires pour soutenir les débits des cartes réseau très haut débit."
-            },
-            {
-                category: "Équipements d'Accès",
-                question: "Quel boîtier convertit le signal optique de la fibre en signal électrique RJ45 chez l'abonné FTTH ?",
-                options: [
-                    "L'ONT (Optical Network Terminal)",
-                    "Le DSLAM",
-                    "Le répéteur Wi-Fi",
-                    "Le switch non manageable"
-                ],
-                correct: 0,
-                explanation: "L'ONT (Terminal de Réseau Optique) reçoit le câble de fibre optique de l'abonné et délivre une sortie Ethernet cuivre RJ45 utilisable par le routeur."
-            },
-            {
-                category: "Technologies Sans-Fil",
-                question: "Quel est le débit théorique maximal approximatif promis par la norme récente Wi-Fi 7 (802.11be) ?",
-                options: [
-                    "1 Gbit/s",
-                    "9,6 Gbit/s",
-                    "46 Gbit/s",
-                    "100 Gbit/s"
-                ],
-                correct: 2,
-                explanation: "Grâce aux canaux de 320 MHz, au MLO (Multi-Link Operation) et à la modulation 4096-QAM, le Wi-Fi 7 peut franchir les 46 Gbit/s théoriques."
-            }
-        ];
+    <!-- ÉCRAN 1 : Identification -->
+    <div id="screen-welcome" class="screen active">
+        <div class="welcome-card">
+            <div class="welcome-title">Identification de l'élève</div>
+            <div class="form-group">
+                <label for="nom">Nom de l'élève :</label>
+                <input type="text" id="nom" placeholder="Ex: DUPONT">
+            </div>
+            <div class="form-group">
+                <label for="prenom">Prénom de l'élève :</label>
+                <input type="text" id="prenom" placeholder="Ex: Jean">
+            </div>
+            <div class="form-group">
+                <label for="classe">Classe :</label>
+                <input type="text" id="classe" placeholder="Ex: 2nde MTNE / 1ère CIEL">
+            </div>
+            <button class="btn" onclick="startQuiz()">Commencer l'Évaluation</button>
+        </div>
+    </div>
 
-        let userProfile = {
-            firstName: '',
-            lastName: '',
-            userClass: ''
+    <!-- ÉCRAN 2 : Quiz -->
+    <div id="screen-quiz" class="screen">
+        <div class="quiz-header">
+            <div>Élève : <span id="header-student-name">-</span></div>
+            <div class="timer">Temps restant : <span id="timer-display">25:00</span></div>
+        </div>
+
+        <form id="quiz-form">
+            <div id="questions-container"></div>
+            <button type="button" class="btn" onclick="finishQuiz()">Terminer et valider mes réponses</button>
+        </form>
+    </div>
+
+    <!-- ÉCRAN 3 : Résultats & Transmission ÉcoleDirecte -->
+    <div id="screen-result" class="screen">
+        <div class="result-box">
+            <h2>Résultat de l'Évaluation</h2>
+            <div class="score-display"><span id="final-score">0</span> / 20</div>
+            <div class="student-info">
+                <strong>Élève :</strong> <span id="res-student">-</span> | 
+                <strong>Classe :</strong> <span id="res-classe">-</span><br>
+                <strong>Temps écoulé :</strong> <span id="res-time">-</span>
+            </div>
+        </div>
+
+        <button class="btn" onclick="showCorrection()">🔍 Consulter la Correction Détaillée</button>
+
+        <div class="copy-box">
+            <label><strong>Bilan à transmettre à votre professeur :</strong></label>
+            <textarea id="copy-text" readonly></textarea>
+            
+            <button class="btn btn-ecole-directe" onclick="copyToClipboard()">
+                📋 Copier le bilan texte pour l'envoyer sur ÉcoleDirecte
+            </button>
+
+            <div class="instructions-ecole">
+                <strong>Consignes pour l'envoi :</strong>
+                <ol style="margin: 5px 0 0 18px; padding: 0;">
+                    <li>Cliquez sur le bouton vert ci-dessus pour copier votre résultat.</li>
+                    <li>Ouvrez votre espace <strong>ÉcoleDirecte</strong> (Messagerie ou Travail à faire).</li>
+                    <li>Collez le texte (<em>Ctrl + V</em>) dans le message destiné à votre professeur.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- ÉCRAN 4 : Correction Détaillée -->
+    <div id="screen-correction" class="screen">
+        <h2>Correction Détaillée</h2>
+        <div id="correction-container"></div>
+        <button class="btn btn-secondary" onclick="backToResult()">⬅ Retour au bilan</button>
+    </div>
+</div>
+
+<script>
+let timerInterval;
+let secondsLeft = 25 * 60;
+let studentInfo = {};
+let generatedQuestions = [];
+let userAnswers = [];
+
+function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function shuffleArray(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+function generateDynamicQuestions() {
+    // 1. Taille film HD
+    const sizeHD = randInt(2, 9);
+    const moHD = sizeHD * 1000;
+
+    // 2. Temps téléchargement Fibre
+    const sizeVid = (randInt(1, 5) * 0.5 + 0.5).toFixed(1);
+    const speedFibre = randInt(1, 5) * 100;
+    const timeFibreSec = Math.round((parseFloat(sizeVid) * 8000) / speedFibre);
+
+    // 3. Temps téléchargement 4K ADSL
+    const size4K = randInt(15, 45);
+    const speedADSL = randInt(4, 15);
+    const time4KSec = Math.round((size4K * 8000) / speedADSL);
+    const time4KMin = Math.floor(time4KSec / 60);
+
+    // 4. Conversion Gbps -> Mo/s
+    const speedGbps = randInt(1, 8);
+    const speedMos = (speedGbps * 1000) / 8;
+
+    // 5. Octets en bits
+    const octetsVal = randInt(120, 600);
+    const bitsVal = octetsVal * 8;
+
+    // 13. Conversion Mbit/s en Mo/s
+    const debitMbit = randInt(2, 8) * 100;
+    const debitMos = debitMbit / 8;
+
+    // 14. Conversion Mo en Mbit
+    const tailleMo = randInt(2, 10) * 8;
+    const tailleMbit = tailleMo * 8;
+
+    const baseQuestions = [
+        {
+            q: `1. Un fichier vidéo pèse ${sizeHD} Go. Quelle est sa taille exacte en Mégaoctets (Mo) dans le système décimal ?`,
+            options: [`${moHD} Mo`, `${sizeHD * 100} Mo`, `${sizeHD * 1024} Mo`, `${sizeHD * 800} Mo`],
+            answerStr: `${moHD} Mo`
+        },
+        {
+            q: `2. Un téléchargement fait ${sizeVid} Go avec un accès Fibre à ${speedFibre} Mbit/s. Combien de secondes dure le transfert théorique ?`,
+            options: [`${timeFibreSec} secondes`, `${timeFibreSec * 2} secondes`, `${Math.round(timeFibreSec / 2)} secondes`, `${timeFibreSec + 45} secondes`],
+            answerStr: `${timeFibreSec} secondes`
+        },
+        {
+            q: `3. Un fichier vidéo 4K pèse ${size4K} Go. Combien de minutes faut-il pour le télécharger en ADSL à ${speedADSL} Mbit/s ?`,
+            options: [`${time4KMin} minutes`, `${time4KMin * 2} minutes`, `${Math.round(time4KMin / 2)} minutes`, `${time4KMin + 20} minutes`],
+            answerStr: `${time4KMin} minutes`
+        },
+        {
+            q: `4. Convertir un débit réseau de ${speedGbps} Gbit/s en Mégaoctets par seconde (Mo/s) :`,
+            options: [`${speedMos} Mo/s`, `${speedGbps * 100} Mo/s`, `${speedMos * 8} Mo/s`, `${speedGbps * 1000} Mo/s`],
+            answerStr: `${speedMos} Mo/s`
+        },
+        {
+            q: `5. Combien de bits contient un fichier de ${octetsVal} octets ?`,
+            options: [`${bitsVal} bits`, `${octetsVal} bits`, `${Math.round(octetsVal / 8)} bits`, `${octetsVal * 10} bits`],
+            answerStr: `${bitsVal} bits`
+        },
+        {
+            q: "6. Quel connecteur vidéo numérique transmet simultanément le son et la vidéo Haute Définition ?",
+            options: ["HDMI", "VGA", "DVI-A", "Jack 3.5mm"],
+            answerStr: "HDMI"
+        },
+        {
+            q: "7. Quel est l'usage principal d'une prise RJ45 sur une carte réseau d'ordinateur ?",
+            options: ["Connecter un câble réseau Ethernet filaire", "Raccorder un écran externe", "Brancher un casque audio", "Alimenter le PC"],
+            answerStr: "Connecter un câble réseau Ethernet filaire"
+        },
+        {
+            q: "8. Quel connecteur vidéo analogique comporte 15 broches sur 3 rangées et une couleur bleue ?",
+            options: ["VGA", "HDMI", "DVI-D", "USB-C"],
+            answerStr: "VGA"
+        },
+        {
+            q: "9. Le connecteur Jack 3.5 mm transmet quel type de signal ?",
+            options: ["Audio analogique", "Vidéo numérique", "Données Ethernet", "Vidéo analogique"],
+            answerStr: "Audio analogique"
+        },
+        {
+            q: "10. Quelle est la vitesse maximale théorique d'un port USB 3.0 (SuperSpeed) ?",
+            options: ["5 Gbit/s", "480 Mbit/s", "100 Mbit/s", "40 Gbit/s"],
+            answerStr: "5 Gbit/s"
+        },
+        {
+            q: "11. Quelle est la différence majeure entre le DVI-D et le DVI-A ?",
+            options: ["DVI-D est numérique, DVI-A est uniquement analogique", "DVI-D véhicule le son, DVI-A la vidéo", "DVI-A est plus rapide", "Aucune différence"],
+            answerStr: "DVI-D est numérique, DVI-A est uniquement analogique"
+        },
+        {
+            q: "12. Quel type de câble utilise-t-on pour raccorder un commutateur (switch) à une carte réseau RJ45 ?",
+            options: ["Câble paire torsadée (Ethernet)", "Câble HDMI", "Câble VGA", "Câble USB-A"],
+            answerStr: "Câble paire torsadée (Ethernet)"
+        },
+        {
+            q: `13. Une connexion annonce ${debitMbit} Mbit/s. Quel est le débit maximal théorique affiché en Mo/s ?`,
+            options: [`${debitMos} Mo/s`, `${debitMbit} Mo/s`, `${debitMos * 2} Mo/s`, `${debitMbit * 8} Mo/s`],
+            answerStr: `${debitMos} Mo/s`
+        },
+        {
+            q: `14. Combien de Megabits (Mbit) représentent ${tailleMo} Megaoctets (Mo) ?`,
+            options: [`${tailleMbit} Mbit`, `${tailleMo} Mbit`, `${tailleMo / 8} Mbit`, `${tailleMbit * 2} Mbit`],
+            answerStr: `${tailleMbit} Mbit`
+        },
+        {
+            q: "15. Quel connecteur réversible moderne permet de transférer données, vidéo et alimentation ?",
+            options: ["USB Type-C", "Micro-USB", "USB Type-A", "Mini-HDMI"],
+            answerStr: "USB Type-C"
+        },
+        {
+            q: "16. Quelle est la principale limitation d'un câble VGA face à un câble HDMI ?",
+            options: ["Le VGA ne transmet pas le son et reste limité au signal analogique", "Le VGA est trop rapide", "Le VGA nécessite une prise secteur", "Le VGA transmet uniquement le son"],
+            answerStr: "Le VGA ne transmet pas le son et reste limité au signal analogique"
+        },
+        {
+            q: "17. Quelle puissance de 10 représente la capacité de 1 Gigaoctet (Go) ?",
+            options: ["10⁹ octets", "10⁶ octets", "10³ octets", "10¹² octets"],
+            answerStr: "10⁹ octets"
+        },
+        {
+            q: "18. Combien d'octets contient 1 Kilooctet (Ko) ?",
+            options: ["1 000 octets", "100 octets", "10 000 octets", "8 000 octets"],
+            answerStr: "1 000 octets"
+        },
+        {
+            q: "19. Quel est le rôle d'un octet en informatique ?",
+            options: ["Représenter un groupe de 8 bits", "Représenter un signal analogique", "Mesurer la fréquence processeur", "Définir la définition d'écran"],
+            answerStr: "Représenter un groupe de 8 bits"
+        },
+        {
+            q: "20. Quelle unité mesure le débit binaire d'un réseau informatique ?",
+            options: ["Bits par seconde (bit/s)", "Octets (o)", "Hertz (Hz)", "Bauds"],
+            answerStr: "Bits par seconde (bit/s)"
+        }
+    ];
+
+    return baseQuestions.map(item => {
+        let optionsShuffled = shuffleArray([...item.options]);
+        let correctIdx = optionsShuffled.indexOf(item.answerStr);
+        return {
+            q: item.q,
+            options: optionsShuffled,
+            answer: correctIdx
         };
-        let currentQuestionIdx = 0;
-        let userAnswers = new Array(quizData.length).fill(null);
-        let timerSeconds = 20 * 60; // 20 minutes
-        let timerInterval = null;
-        let timeElapsed = 0;
-        let qrCodeObj = null;
+    });
+}
 
-        // Initialisation du grand QR Code au chargement
-        window.addEventListener('DOMContentLoaded', () => {
-            const initialUrl = document.getElementById('custom-url-input').value.trim() || window.location.href;
-            generateQrCode(initialUrl);
+function startQuiz() {
+    const nom = document.getElementById('nom').value.trim();
+    const prenom = document.getElementById('prenom').value.trim();
+    const classe = document.getElementById('classe').value.trim();
+
+    if (!nom || !prenom || !classe) {
+        alert('Veuillez remplir tous les champs (Nom, Prénom et Classe) avant de démarrer.');
+        return;
+    }
+
+    studentInfo = { nom, prenom, classe };
+    document.getElementById('header-student-name').innerText = `${prenom} ${nom} (${classe})`;
+
+    document.getElementById('screen-welcome').classList.remove('active');
+    document.getElementById('screen-quiz').classList.add('active');
+
+    secondsLeft = 25 * 60;
+    generatedQuestions = generateDynamicQuestions();
+    renderQuestions();
+    startTimer();
+}
+
+function startTimer() {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        secondsLeft--;
+        let m = Math.floor(secondsLeft / 60);
+        let s = secondsLeft % 60;
+        document.getElementById('timer-display').innerText = `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
+
+        if (secondsLeft <= 0) {
+            clearInterval(timerInterval);
+            alert('Le temps imparti est écoulé ! Validation automatique.');
+            finishQuiz();
+        }
+    }, 1000);
+}
+
+function renderQuestions() {
+    const container = document.getElementById('questions-container');
+    container.innerHTML = '';
+
+    generatedQuestions.forEach((q, idx) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+
+        let optsHTML = '';
+        q.options.forEach((opt, oIdx) => {
+            optsHTML += `
+                <li class="option-item">
+                    <label class="option-label">
+                        <input type="radio" name="q${idx}" value="${oIdx}">
+                        ${opt}
+                    </label>
+                </li>
+            `;
         });
 
-        function generateQrCode(url) {
-            const container = document.getElementById('qrcode');
-            container.innerHTML = '';
-            qrCodeObj = new QRCode(container, {
-                text: url,
-                width: 300,  // Grand format visuel pour projection tableau (300px)
-                height: 300,
-                colorDark : "#0f172a",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
-            });
+        card.innerHTML = `
+            <div class="question-title">${q.q}</div>
+            <ul class="options-list">${optsHTML}</ul>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function finishQuiz() {
+    clearInterval(timerInterval);
+
+    let score = 0;
+    userAnswers = [];
+
+    generatedQuestions.forEach((q, idx) => {
+        const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+        let chosenVal = selected ? parseInt(selected.value) : -1;
+        userAnswers.push(chosenVal);
+
+        if (chosenVal === q.answer) {
+            score++;
         }
+    });
 
-        function updateUrlAndQr(newUrl) {
-            if (newUrl.trim() !== "") {
-                generateQrCode(newUrl.trim());
-            }
-        }
+    const elapsedSeconds = (25 * 60) - secondsLeft;
+    let elapsedM = Math.floor(elapsedSeconds / 60);
+    let elapsedS = elapsedSeconds % 60;
+    const timeStr = `${elapsedM} min ${elapsedS} s`;
 
-        function copyShortcutUrl() {
-            const input = document.getElementById('custom-url-input');
-            input.select();
-            document.execCommand('copy');
-            showNotification("Lien raccourci copié dans le presse-papier !");
-        }
+    document.getElementById('final-score').innerText = score;
+    document.getElementById('res-student').innerText = `${studentInfo.prenom} ${studentInfo.nom.toUpperCase()}`;
+    document.getElementById('res-classe').innerText = studentInfo.classe;
+    document.getElementById('res-time').innerText = timeStr;
 
-        function startQuiz(e) {
-            e.preventDefault();
-            
-            const fn = document.getElementById('user-firstname').value.trim();
-            const ln = document.getElementById('user-lastname').value.trim();
-            const cls = document.getElementById('user-class').value.trim();
+    const copyText = `========================================
+ÉVALUATION - QUANTITÉS, DÉBITS & CONNECTEURS
+========================================
+Nom : ${studentInfo.nom.toUpperCase()}
+Prénom : ${studentInfo.prenom}
+Classe : ${studentInfo.classe}
+----------------------------------------
+NOTE OBTENUE : ${score} / 20
+Temps d'exécution : ${timeStr}
+Date : ${new Date().toLocaleDateString('fr-FR')}
+========================================`;
 
-            if (!fn || !ln || !cls) return;
+    document.getElementById('copy-text').value = copyText;
 
-            userProfile.firstName = fn;
-            userProfile.lastName = ln;
-            userProfile.userClass = cls;
+    document.getElementById('screen-quiz').classList.remove('active');
+    document.getElementById('screen-result').classList.add('active');
+}
 
-            // Mise à jour affichage élève
-            document.getElementById('display-user-name').textContent = `${fn} ${ln}`;
-            document.getElementById('display-user-class').textContent = `Classe : ${cls}`;
-            
-            // Masquage accueil / affichage quiz
-            document.getElementById('screen-welcome').classList.add('hidden');
-            document.getElementById('screen-quiz').classList.remove('hidden');
+function copyToClipboard() {
+    const textarea = document.getElementById('copy-text');
+    textarea.select();
+    document.execCommand('copy');
+    alert('Bilan copié dans le presse-papier ! L\'élève peut ouvrir ÉcoleDirecte et le coller (Ctrl + V).');
+}
 
-            // Timer & Question
-            startTimer();
-            renderQuestionGrid();
-            renderQuestion();
-        }
+function showCorrection() {
+    const container = document.getElementById('correction-container');
+    container.innerHTML = '';
 
-        function startTimer() {
-            updateTimerDisplay();
-            timerInterval = setInterval(() => {
-                timerSeconds--;
-                timeElapsed++;
-                updateTimerDisplay();
+    generatedQuestions.forEach((q, idx) => {
+        const userChoice = userAnswers[idx];
+        const isCorrect = userChoice === q.answer;
 
-                if (timerSeconds <= 0) {
-                    clearInterval(timerInterval);
-                    finishQuiz();
-                }
-            }, 1000);
-        }
+        const card = document.createElement('div');
+        card.className = `correction-card ${isCorrect ? 'correct' : 'incorrect'}`;
 
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timerSeconds / 60);
-            const seconds = timerSeconds % 60;
-            const formatted = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            document.getElementById('timer-display').textContent = formatted;
-        }
+        const userText = userChoice !== -1 ? q.options[userChoice] : '<em>Aucune réponse transmise</em>';
+        const correctText = q.options[q.answer];
 
-        function renderQuestionGrid() {
-            const gridContainer = document.getElementById('question-grid');
-            gridContainer.innerHTML = '';
+        card.innerHTML = `
+            <div class="question-title">${q.q}</div>
+            <div class="correction-status ${isCorrect ? 'correct' : 'incorrect'}">
+                ${isCorrect ? '✔ Réponse correcte' : '✖ Réponse incorrecte'}
+            </div>
+            <div class="user-answer"><strong>Votre réponse :</strong> ${userText}</div>
+            ${!isCorrect ? `<div class="correct-answer"><strong>Bonne réponse :</strong> ${correctText}</div>` : ''}
+        `;
 
-            quizData.forEach((_, idx) => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                const isAnswered = userAnswers[idx] !== null;
-                const isCurrent = idx === currentQuestionIdx;
+        container.appendChild(card);
+    });
 
-                btn.className = `w-7 h-7 text-xs font-bold rounded-lg border transition flex items-center justify-center cursor-pointer ${
-                    isCurrent 
-                        ? 'bg-blue-500 text-white border-blue-400 ring-2 ring-blue-400/40'
-                        : isAnswered 
-                            ? 'bg-slate-700 text-emerald-400 border-emerald-500/50' 
-                            : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700'
-                }`;
+    document.getElementById('screen-result').classList.remove('active');
+    document.getElementById('screen-correction').classList.add('active');
+}
 
-                btn.textContent = idx + 1;
-                btn.onclick = () => {
-                    currentQuestionIdx = idx;
-                    renderQuestion();
-                };
-                gridContainer.appendChild(btn);
-            });
+function backToResult() {
+    document.getElementById('screen-correction').classList.remove('active');
+    document.getElementById('screen-result').classList.add('active');
+}
+</script>
 
-            const answeredCount = userAnswers.filter(a => a !== null).length;
-            document.getElementById('answered-count-display').textContent = `${answeredCount} / ${quizData.length} répondue(s)`;
-        }
-
-        function renderQuestion() {
-            const q = quizData[currentQuestionIdx];
-            
-            document.getElementById('question-category').textContent = q.category;
-            document.getElementById('question-text').textContent = `${currentQuestionIdx + 1}. ${q.question}`;
-            document.getElementById('display-progress').textContent = `Question ${currentQuestionIdx + 1} sur ${quizData.length}`;
-            
-            const pct = ((currentQuestionIdx + 1) / quizData.length) * 100;
-            document.getElementById('progress-bar').style.width = `${pct}%`;
-
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
-
-            q.options.forEach((optText, i) => {
-                const isSelected = userAnswers[currentQuestionIdx] === i;
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = `option-btn w-full text-left p-4 rounded-2xl border text-sm md:text-base font-medium flex items-center justify-between cursor-pointer ${
-                    isSelected 
-                        ? 'bg-blue-600/30 border-blue-500 text-white shadow-md' 
-                        : 'bg-slate-800/60 hover:bg-slate-800 border-slate-700/80 text-slate-200'
-                }`;
-                
-                btn.onclick = () => selectOption(i);
-
-                btn.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <span class="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold ${
-                            isSelected ? 'bg-blue-500 text-white' : 'bg-slate-700 text-slate-300'
-                        }">${String.fromCharCode(65 + i)}</span>
-                        <span>${optText}</span>
-                    </div>
-                    ${isSelected ? '<i class="fa-solid fa-circle-check text-blue-400 text-lg"></i>' : ''}
-                `;
-                container.appendChild(btn);
-            });
-
-            document.getElementById('btn-prev').disabled = (currentQuestionIdx === 0);
-            
-            const nextBtnText = document.getElementById('next-btn-text');
-            if (currentQuestionIdx === quizData.length - 1) {
-                nextBtnText.textContent = "Soumettre le Quiz";
-            } else {
-                nextBtnText.textContent = "Suivant";
-            }
-
-            renderQuestionGrid();
-        }
-
-        function selectOption(index) {
-            userAnswers[currentQuestionIdx] = index;
-            renderQuestion();
-        }
-
-        function nextQuestion() {
-            if (currentQuestionIdx < quizData.length - 1) {
-                currentQuestionIdx++;
-                renderQuestion();
-            } else {
-                finishQuiz();
-            }
-        }
-
-        function prevQuestion() {
-            if (currentQuestionIdx > 0) {
-                currentQuestionIdx--;
-                renderQuestion();
-            }
-        }
-
-        function finishQuiz() {
-            clearInterval(timerInterval);
-
-            let score = 0;
-            quizData.forEach((q, idx) => {
-                if (userAnswers[idx] === q.correct) {
-                    score++;
-                }
-            });
-
-            const percentage = Math.round((score / quizData.length) * 100);
-
-            document.getElementById('final-score').textContent = `${score} / ${quizData.length}`;
-            document.getElementById('score-percentage').textContent = `${percentage}% de réussite`;
-            document.getElementById('result-user-info').textContent = `Élève : ${userProfile.firstName} ${userProfile.lastName} (Classe : ${userProfile.userClass})`;
-            
-            const minutesUsed = Math.floor(timeElapsed / 60);
-            const secondsUsed = timeElapsed % 60;
-            document.getElementById('completion-time').textContent = `Temps de réalisation : ${minutesUsed} min ${secondsUsed} sec`;
-
-            const scoreIcon = document.getElementById('score-icon');
-            if (percentage >= 80) {
-                scoreIcon.className = "fa-solid fa-trophy text-5xl text-amber-400";
-            } else if (percentage >= 50) {
-                scoreIcon.className = "fa-solid fa-medal text-5xl text-blue-400";
-            } else {
-                scoreIcon.className = "fa-solid fa-circle-exclamation text-5xl text-orange-400";
-            }
-
-            renderReview();
-
-            document.getElementById('screen-quiz').classList.add('hidden');
-            document.getElementById('screen-results').classList.remove('hidden');
-        }
-
-        function renderReview() {
-            const container = document.getElementById('review-container');
-            container.innerHTML = '';
-
-            quizData.forEach((q, idx) => {
-                const uAns = userAnswers[idx];
-                const isCorrect = (uAns === q.correct);
-
-                const card = document.createElement('div');
-                card.className = `p-4 rounded-2xl border text-sm space-y-2 ${
-                    isCorrect ? 'bg-emerald-950/20 border-emerald-800/40' : 'bg-rose-950/20 border-rose-800/40'
-                }`;
-
-                const statusBadge = isCorrect 
-                    ? `<span class="text-emerald-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Correct</span>`
-                    : `<span class="text-rose-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-xmark"></i> Incorrect</span>`;
-
-                const userAnsText = uAns !== null ? q.options[uAns] : 'Aucune réponse';
-                const correctAnsText = q.options[q.correct];
-
-                card.innerHTML = `
-                    <div class="flex items-center justify-between gap-2 border-b border-slate-700/50 pb-2">
-                        <span class="font-bold text-white">${idx + 1}. ${q.question}</span>
-                        ${statusBadge}
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs pt-1">
-                        <div>
-                            <span class="text-slate-400">Réponse choisie :</span>
-                            <span class="font-semibold ${isCorrect ? 'text-emerald-300' : 'text-rose-300'}">${userAnsText}</span>
-                        </div>
-                        ${!isCorrect ? `
-                        <div>
-                            <span class="text-slate-400">Réponse attendue :</span>
-                            <span class="font-semibold text-emerald-300">${correctAnsText}</span>
-                        </div>` : ''}
-                    </div>
-                    <div class="text-xs text-slate-300 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80 mt-2">
-                        <strong class="text-blue-400">Explication :</strong> ${q.explanation}
-                    </div>
-                `;
-
-                container.appendChild(card);
-            });
-        }
-
-        function buildReportTextÉcoleDirecte() {
-            let score = 0;
-            quizData.forEach((q, idx) => {
-                if (userAnswers[idx] === q.correct) score++;
-            });
-
-            const minutesUsed = Math.floor(timeElapsed / 60);
-            const secondsUsed = timeElapsed % 60;
-
-            let report = `==============================================\n`;
-            report += `RÉSULTATS EVALUATION RÉSEAUX INFORMATIQUES\n`;
-            report += `Destinataire : M. Avelino GONÇALVES SILVA\n`;
-            report += `==============================================\n`;
-            report += `Nom de l'élève : ${userProfile.lastName.toUpperCase()}\n`;
-            report += `Prénom de l'élève : ${userProfile.firstName}\n`;
-            report += `Classe : ${userProfile.userClass}\n`;
-            report += `Score obtenu : ${score} / ${quizData.length} (${Math.round((score/quizData.length)*100)}%)\n`;
-            report += `Temps de réalisation : ${minutesUsed} min ${secondsUsed} sec\n`;
-            report += `==============================================\n\n`;
-            report += `DÉTAIL DES RÉPONSES ET EXPLICATIFS :\n\n`;
-
-            quizData.forEach((q, idx) => {
-                const uAns = userAnswers[idx];
-                const isCorrect = (uAns === q.correct);
-                report += `Q${idx + 1}. ${q.question}\n`;
-                report += `   - Réponse élève : ${uAns !== null ? q.options[uAns] : 'Non répondue'}\n`;
-                report += `   - Statut : ${isCorrect ? 'VALIDE (+1 pt)' : 'ERREUR (Bonne réponse : ' + q.options[q.correct] + ')'}\n\n`;
-            });
-
-            return report;
-        }
-
-        function copyToClipboardÉcoleDirecte() {
-            const reportText = buildReportTextÉcoleDirecte();
-            
-            const textarea = document.createElement('textarea');
-            textarea.value = reportText;
-            document.body.appendChild(textarea);
-            textarea.select();
-            
-            try {
-                document.execCommand('copy');
-                showNotification("✓ Bilan copié ! Collez-le dans la messagerie ou le devoir ÉcoleDirecte pour M. GONÇALVES SILVA.");
-            } catch (err) {
-                showNotification("Erreur de copie. Veuillez sélectionner le texte manuellement.");
-            }
-            
-            document.body.removeChild(textarea);
-        }
-
-        function showNotification(msg) {
-            const notif = document.getElementById('notification');
-            notif.textContent = msg;
-            notif.classList.remove('hidden');
-            setTimeout(() => {
-                notif.classList.add('hidden');
-            }, 5000);
-        }
-    </script>
 </body>
 </html>
